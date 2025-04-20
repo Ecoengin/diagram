@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS 3-Tier Architecture Presentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+  <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/white.css">
+  <style>
+    .mermaid {
+      background: #f9f9f9;
+      padding: 1em;
+      border-radius: 8px;
+    }
+    svg.d3-diagram {
+      width: 100%;
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <!-- Slide 1: Mermaid Diagram -->
+      <section>
+        <h2>AWS 3-Tier Architecture (Mermaid)</h2>
+        <div class="mermaid">
+          graph TD
+              User --> ALB[Application Load Balancer]
+              ALB --> Web[Web Tier - EC2/Auto Scaling]
+              Web --> App[Application Tier - Containers]
+              App --> DB[(Database Tier - RDS)]
+        </div>
+      </section>
+
+      <!-- Slide 2: D3 Flow Diagram -->
+      <section>
+        <h2>AWS Flow (D3.js)</h2>
+        <svg class="d3-diagram"></svg>
+      </section>
+
+      <!-- Slide 3: Flow Breakdown -->
+      <section>
+        <h3>Architecture Breakdown</h3>
+        <ul>
+          <li>ALB = Entry point</li>
+          <li>Web Tier = EC2, auto-scale</li>
+          <li>App Tier = Containers</li>
+          <li>DB Tier = RDS</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+
+  <!-- Reveal.js -->
+  <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize();
+  </script>
+
+  <!-- Mermaid.js -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+
+  <!-- D3.js Library -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <!-- D3.js Diagram Script -->
+  <script>
+    window.addEventListener('load', function () {
+      const svg = d3.select(".d3-diagram");
+      const nodes = [
+        { id: 'User', x: 50, y: 150 },
+        { id: 'ALB', x: 150, y: 150 },
+        { id: 'Web', x: 270, y: 120 },
+        { id: 'App', x: 390, y: 150 },
+        { id: 'DB', x: 510, y: 150 },
+      ];
+      const links = [
+        ['User', 'ALB'], ['ALB', 'Web'], ['Web', 'App'], ['App', 'DB']
+      ];
+
+      svg.selectAll('circle')
+        .data(nodes)
+        .enter()
+        .append('circle')
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .attr('r', 20)
+        .attr('fill', '#88c0d0');
+
+      svg.selectAll('text')
+        .data(nodes)
+        .enter()
+        .append('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y + 35)
+        .text(d => d.id)
+        .attr('font-size', '14px')
+        .attr('text-anchor', 'middle');
+
+      svg.selectAll('line')
+        .data(links)
+        .enter()
+        .append('line')
+        .attr('x1', d => nodes.find(n => n.id === d[0]).x)
+        .attr('y1', d => nodes.find(n => n.id === d[0]).y)
+        .attr('x2', d => nodes.find(n => n.id === d[0]).x)
+        .attr('y2', d => nodes.find(n => n.id === d[0]).y)
+        .attr('stroke', '#333')
+        .attr('stroke-width', 2)
+        .transition()
+        .duration(1000)
+        .attr('x2', d => nodes.find(n => n.id === d[1]).x)
+        .attr('y2', d => nodes.find(n => n.id === d[1]).y);
+    });
+  </script>
+</body>
+</html>
