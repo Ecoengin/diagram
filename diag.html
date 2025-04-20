@@ -23,13 +23,17 @@
     <div class="slides">
       <!-- Slide 1: Mermaid Diagram -->
       <section>
-        <h2>AWS 3-Tier Architecture (Mermaid)</h2>
+        <h2>AWS 3-Tier Architecture</h2>
         <div class="mermaid">
           graph TD
               User --> ALB[Application Load Balancer]
+
               ALB --> Web[Web Tier - EC2/Auto Scaling]
+
               Web --> App[Application Tier - Containers]
+
               App --> DB[(Database Tier - RDS)]
+
         </div>
       </section>
 
@@ -65,42 +69,24 @@
   </script>
 
   <!-- D3.js Library -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js" onload="renderD3()"></script>
 
   <!-- D3.js Diagram Script -->
   <script>
-    window.addEventListener('load', function () {
+    function renderD3() {
       const svg = d3.select(".d3-diagram");
       const nodes = [
-        { id: 'User', x: 50, y: 150 },
-        { id: 'ALB', x: 150, y: 150 },
-        { id: 'Web', x: 270, y: 120 },
-        { id: 'App', x: 390, y: 150 },
-        { id: 'DB', x: 510, y: 150 },
+        { id: 'User', x: 50, y: 150, icon: 'https://d1.awsstatic.com/webteam/architecture-icons/Arch_AWS-Cloud_alt.svg' },
+        { id: 'ALB', x: 150, y: 150, icon: 'https://d1.awsstatic.com/webteam/architecture-icons/Arch_Elastic-Load-Balancing_ALB_48.svg' },
+        { id: 'Web', x: 270, y: 120, icon: 'https://d1.awsstatic.com/webteam/architecture-icons/Arch_Amazon-EC2_48.svg' },
+        { id: 'App', x: 390, y: 150, icon: 'https://d1.awsstatic.com/webteam/architecture-icons/Arch_Amazon-ECS_48.svg' },
+        { id: 'DB', x: 510, y: 150, icon: 'https://d1.awsstatic.com/webteam/architecture-icons/Arch_Amazon-RDS_48.svg' },
       ];
       const links = [
         ['User', 'ALB'], ['ALB', 'Web'], ['Web', 'App'], ['App', 'DB']
       ];
 
-      svg.selectAll('circle')
-        .data(nodes)
-        .enter()
-        .append('circle')
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-        .attr('r', 20)
-        .attr('fill', '#88c0d0');
-
-      svg.selectAll('text')
-        .data(nodes)
-        .enter()
-        .append('text')
-        .attr('x', d => d.x)
-        .attr('y', d => d.y + 35)
-        .text(d => d.id)
-        .attr('font-size', '14px')
-        .attr('text-anchor', 'middle');
-
+      // Draw lines (links) with animation
       svg.selectAll('line')
         .data(links)
         .enter()
@@ -112,10 +98,43 @@
         .attr('stroke', '#333')
         .attr('stroke-width', 2)
         .transition()
-        .duration(1000)
+        .delay((d, i) => i * 400)
+        .duration(800)
         .attr('x2', d => nodes.find(n => n.id === d[1]).x)
         .attr('y2', d => nodes.find(n => n.id === d[1]).y);
-    });
+
+      // Draw AWS icons (nodes) with pop-in animation
+      svg.selectAll('image')
+        .data(nodes)
+        .enter()
+        .append('image')
+        .attr('xlink:href', d => d.icon)
+        .attr('x', d => d.x - 24)
+        .attr('y', d => d.y - 24)
+        .attr('width', 0)
+        .attr('height', 0)
+        .transition()
+        .delay((d, i) => 400 * i)
+        .duration(600)
+        .attr('width', 48)
+        .attr('height', 48);
+
+      // Draw labels
+      svg.selectAll('text')
+        .data(nodes)
+        .enter()
+        .append('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y + 40)
+        .text(d => d.id)
+        .attr('font-size', '14px')
+        .attr('text-anchor', 'middle')
+        .attr('opacity', 0)
+        .transition()
+        .delay((d, i) => 400 * i + 600)
+        .duration(400)
+        .attr('opacity', 1);
+    }
   </script>
 </body>
 </html>
